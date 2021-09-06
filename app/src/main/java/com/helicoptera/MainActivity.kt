@@ -6,11 +6,16 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.utils.ViewPortHandler
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -62,14 +67,13 @@ class MainActivity : AppCompatActivity() {
 
         chart.xAxis.apply {
             position = XAxisPosition.BOTTOM
-            labelCount = INTERVAL_COUNT
-//            axisMinimum = 0F
-//            axisMaximum = 1F
-//            mAxisRange = 1F / INTERVAL_COUNT
-//            axisLineWidth = 0.05F
+            labelCount = INTERVAL_COUNT + 1
+            mEntryCount = INTERVAL_COUNT + 1
 
             textSize = 0.5F
+            valueFormatter = formatter
         }
+
         chart.axisLeft.apply {
             axisMinimum = 0F
             axisMaximum = 1F / INTERVAL_COUNT * 2
@@ -78,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         val entries = mutableListOf<BarEntry>()
         for (i in 0 until INTERVAL_COUNT) {
-            entries.add(BarEntry(i.toFloat(), frequencies[i].toFloat()))
+            entries.add(BarEntry(i.toFloat() , frequencies[i].toFloat()))
         }
 
         val dataSet = BarDataSet(entries, "Частота значений").apply {
@@ -130,7 +134,6 @@ class MainActivity : AppCompatActivity() {
         pi.text = (Math.PI / 4).toString()
     }
 
-    //ЕБАТЬ страх
     private fun calculatePeriodsInfo(randoms: List<Double>) {
         val periodTextView = findViewById<TextView>(R.id.period)
         val aperiodicIntervalTextView = findViewById<TextView>(R.id.aperiodicInterval)
@@ -193,6 +196,12 @@ class MainActivity : AppCompatActivity() {
         calculateEstimates(randoms)
         check(randoms)
         calculatePeriodsInfo(randoms)
+    }
+
+    private val formatter = object : ValueFormatter() {
+        override fun getFormattedValue(value: Float): String {
+            return ((value + 1) / INTERVAL_COUNT).toString()
+        }
     }
 
     companion object {
